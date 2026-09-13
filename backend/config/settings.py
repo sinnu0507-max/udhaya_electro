@@ -15,6 +15,8 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables
+# Local development: reads from .env
+# Production: Render Environment Variables take precedence
 load_dotenv(BASE_DIR / ".env")
 
 
@@ -22,11 +24,21 @@ load_dotenv(BASE_DIR / ".env")
 # Security
 # ----------------------------------------------------
 
-SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-$&g)df-je-for#-i@rjc_+&cn*lqi7yd3bw$l$s@h8t1n$@mj4")
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
-DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
+DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",") if os.environ.get("ALLOWED_HOSTS") else []
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get("ALLOWED_HOSTS", "").split(",")
+    if host.strip()
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
+]
 
 
 # ----------------------------------------------------
@@ -194,7 +206,11 @@ REST_FRAMEWORK = {
 # CORS Configuration
 # ----------------------------------------------------
 
-CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:5173").split(",")
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",")
+    if origin.strip()
+]
 
 CORS_ALLOW_CREDENTIALS = True
 
