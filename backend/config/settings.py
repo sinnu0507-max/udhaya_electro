@@ -8,15 +8,25 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
+
 # ----------------------------------------------------
 # Base Directory
 # ----------------------------------------------------
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables
-# Local development: reads from .env
-# Production: Render Environment Variables take precedence
+
+# ----------------------------------------------------
+# Environment Variables
+# ----------------------------------------------------
+
+# Local development:
+#   Reads values from .env if it exists.
+#
+# Production on Render:
+#   Render Environment Variables are already available
+#   through os.environ.
+
 load_dotenv(BASE_DIR / ".env")
 
 
@@ -26,13 +36,32 @@ load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
-DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY environment variable is not set")
+
+
+DEBUG = os.environ.get("DEBUG", "False").strip().lower() == "true"
+
+
+# ALLOWED_HOSTS must contain hostnames only.
+# Example:
+#   ALLOWED_HOSTS=udhaya-electro.onrender.com,localhost,127.0.0.1
 
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.environ.get("ALLOWED_HOSTS", "").split(",")
     if host.strip()
 ]
+
+
+# ----------------------------------------------------
+# CSRF Trusted Origins
+# ----------------------------------------------------
+
+# These must include the full scheme (https://).
+#
+# Example:
+#   CSRF_TRUSTED_ORIGINS=https://udhaya-electro.vercel.app
 
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
@@ -139,16 +168,28 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "UserAttributeSimilarityValidator"
+        ),
     },
     {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "MinimumLengthValidator"
+        ),
     },
     {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "CommonPasswordValidator"
+        ),
     },
     {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "NumericPasswordValidator"
+        ),
     },
 ]
 
@@ -171,6 +212,7 @@ USE_TZ = True
 # ----------------------------------------------------
 
 STATIC_URL = "static/"
+
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
@@ -179,6 +221,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # ----------------------------------------------------
 
 MEDIA_URL = "/media/"
+
 MEDIA_ROOT = BASE_DIR / "media"
 
 
@@ -206,6 +249,11 @@ REST_FRAMEWORK = {
 # CORS Configuration
 # ----------------------------------------------------
 
+# This should contain the FULL frontend origin.
+#
+# Example:
+#   CORS_ALLOWED_ORIGINS=https://udhaya-electro.vercel.app
+
 CORS_ALLOWED_ORIGINS = [
     origin.strip()
     for origin in os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",")
@@ -219,6 +267,6 @@ CORS_ALLOW_CREDENTIALS = True
 # File Upload Settings
 # ----------------------------------------------------
 
-FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760      # 10 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
 
-DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760      # 10 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
