@@ -39,7 +39,7 @@ function Header() {
                     <div className="logo-text">
 
                         <h2>
-                            IndustrialElectro
+                            Uthaya Industrial Electro
                         </h2>
 
                         <span>
