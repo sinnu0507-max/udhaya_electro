@@ -96,6 +96,10 @@ INSTALLED_APPS = [
     "categories",
     "contact",
     "material_requests",
+
+    #storage
+    "cloudinary_storage",
+    "cloudinary",
 ]
 
 
@@ -235,6 +239,21 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 
 MEDIA_ROOT = BASE_DIR / "media"
+
+
+# ----------------------------------------------------
+# Cloudinary (media file storage)
+# ----------------------------------------------------
+
+# Set CLOUDINARY_URL in your environment, e.g.:
+#   CLOUDINARY_URL=cloudinary://<api_key>:<api_secret>@<cloud_name>
+#
+# When set, uploaded files go to Cloudinary instead of the local
+# filesystem — required on Render since its disk is wiped on every
+# deploy/restart.
+
+if os.environ.get("CLOUDINARY_URL"):
+    DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 
 # ----------------------------------------------------
