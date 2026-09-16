@@ -1,17 +1,9 @@
-const API_URL = "http://127.0.0.1:8000/api/contact/";
-
+import api from "./api";
 
 export async function getContactInfo() {
 
-    const response = await fetch(API_URL);
+    const response = await api.get("contact/");
 
-    if (!response.ok) {
+    return response.data;
 
-        throw new Error(
-            "Failed to load contact information"
-        );
-
-    }
-
-    return response.json();
 }
